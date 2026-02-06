@@ -1,0 +1,350 @@
+/* ===== AstraSync • Apple Watch / Apple Health Dark Theme (CLEAN) ===== */
+
+:root{
+  --bg:#000000;
+  --panel: rgba(255,255,255,.04);
+  --card: rgba(255,255,255,.06);
+  --border: rgba(255,255,255,.10);
+  --text:#ffffff;
+  --muted: rgba(235,245,255,.70);
+
+  --primary:#0A84FF;
+  --green:#32D74B;
+  --yellow:#FFD60A;
+  --red:#FF453A;
+  --pink:#FF2D55;
+  --teal:#64D2FF;
+
+  --radius:22px;
+  --radius2:28px;
+  --shadow: 0 18px 50px rgba(0,0,0,.60);
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  background:
+    radial-gradient(900px 700px at 20% 10%, rgba(255,45,85,.18), transparent 60%),
+    radial-gradient(900px 700px at 85% 15%, rgba(10,132,255,.16), transparent 58%),
+    radial-gradient(900px 700px at 40% 85%, rgba(50,215,75,.12), transparent 60%),
+    var(--bg);
+  color: var(--text);
+}
+
+/* Layout */
+.shell{
+  display:grid;
+  grid-template-columns: 78px 1fr 340px;
+  gap:18px;
+  padding:18px;
+  min-height:100vh;
+}
+
+/* Glass surfaces */
+.sidebar, .header, .card, .right{
+  background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.04));
+  border: 1px solid var(--border);
+  border-radius: var(--radius2);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(14px);
+}
+
+/* Sidebar */
+.sidebar{
+  padding:12px 10px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+}
+.brand{
+  width:46px;height:46px;
+  border-radius:16px;
+  background: rgba(10,132,255,.20);
+  border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:950;
+}
+.navIcon{
+  width:46px;height:46px;
+  border-radius:18px;
+  border:1px solid var(--border);
+  background: rgba(255,255,255,.05);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  transition:.15s;
+  text-decoration:none;
+  color:var(--text);
+}
+.navIcon:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.20)}
+.navIcon.active{
+  background: rgba(10,132,255,.18);
+  border-color: rgba(10,132,255,.60);
+}
+
+/* Main */
+.main{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+.right{
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+/* Header */
+.header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  padding:16px;
+}
+.hTitle{
+  font-size:24px;
+  font-weight:950;
+  margin:0;
+  letter-spacing:-0.02em;
+}
+.hSub{
+  margin:6px 0 0;
+  color:var(--muted);
+  font-size:13px;
+}
+.hActions{
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+}
+
+/* Buttons */
+.btn{
+  border:none;
+  border-radius:16px;
+  padding:10px 14px;
+  font-weight:950;
+  cursor:pointer;
+  color:var(--text);
+  background: rgba(10,132,255,.18);
+  border: 1px solid rgba(10,132,255,.60);
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+.btn:hover{filter:brightness(1.10)}
+.btn.secondary{
+  background: rgba(255,255,255,.06);
+  border: 1px solid var(--border);
+}
+.btn.danger{
+  background: rgba(255,69,58,.16);
+  border: 1px solid rgba(255,69,58,.55);
+}
+
+/* Inputs */
+.select, .input, .field input, .field select{
+  background: rgba(255,255,255,.06);
+  border:1px solid var(--border);
+  color:var(--text);
+  border-radius:16px;
+  padding:10px 12px;
+}
+
+/* Cards and grids */
+.card{padding:14px;}
+.cardTitle{
+  font-size:16px;
+  font-weight:950;
+  margin:0 0 8px;
+  letter-spacing:-0.02em;
+}
+.muted{color:var(--muted);font-size:13px}
+
+.grid4{
+  display:grid;
+  grid-template-columns: repeat(4, minmax(0,1fr));
+  gap:14px;
+}
+.metric{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:10px;
+}
+.metric .value{
+  font-size:28px;
+  font-weight:950;
+  letter-spacing:-0.03em;
+}
+
+/* Pills */
+.pill{
+  padding:7px 12px;
+  border-radius:999px;
+  font-weight:950;
+  font-size:12px;
+  border:1px solid var(--border);
+  background: rgba(255,255,255,.06);
+}
+.pill.green{background:rgba(50,215,75,.16); border-color:rgba(50,215,75,.55)}
+.pill.yellow{background:rgba(255,214,10,.16); border-color:rgba(255,214,10,.55)}
+.pill.red{background:rgba(255,69,58,.16); border-color:rgba(255,69,58,.55)}
+
+/* Risk / chips / checklist */
+.twoCols{
+  display:grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap:14px;
+}
+.riskTop{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:10px;
+}
+.conf{font-weight:950;color:var(--muted);font-size:13px}
+
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.chip{
+  padding:8px 10px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background: rgba(255,255,255,.06);
+  font-size:12px;
+  font-weight:950;
+}
+
+.checklist{margin:10px 0 0;padding:0;list-style:none;display:grid;gap:8px}
+.checklist li{
+  display:flex;gap:10px;align-items:flex-start;
+  font-size:13px;
+}
+.checklist li span{
+  width:18px;height:18px;
+  border-radius:7px;
+  border:1px solid var(--border);
+  display:inline-flex;align-items:center;justify-content:center;
+  background: rgba(255,255,255,.06);
+}
+
+/* Right panel blocks */
+.profileCard{display:flex;gap:12px;align-items:center}
+.avatar{
+  width:46px;height:46px;
+  border-radius:16px;
+  background: rgba(10,132,255,.20);
+  border:1px solid var(--border);
+}
+.profileName{font-weight:950}
+.kvGrid{display:grid;grid-template-columns: repeat(3,1fr);gap:10px}
+.kv{
+  padding:10px;
+  border-radius:16px;
+  border:1px solid var(--border);
+  background: rgba(255,255,255,.06);
+}
+.kv .k{color:var(--muted);font-size:12px}
+.kv .v{font-weight:950;margin-top:4px}
+.list{display:grid;gap:8px}
+.listItem{
+  padding:10px;
+  border-radius:16px;
+  border:1px solid var(--border);
+  background: rgba(255,255,255,.06);
+  display:flex;justify-content:space-between;gap:10px;align-items:center;
+  font-size:13px;
+}
+
+/* Forms */
+.formGrid{
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap:12px;
+}
+.field label{
+  display:block;
+  color:var(--muted);
+  font-size:12px;
+  margin:0 0 6px;
+}
+.toggleRow{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.toggle{
+  display:flex;gap:10px;align-items:center;
+  padding:10px 12px;
+  border-radius:16px;
+  border:1px solid var(--border);
+  background: rgba(255,255,255,.06);
+}
+.toggle input{transform:scale(1.2)}
+.hr{height:1px;background:var(--border);margin:12px 0}
+
+/* Tables */
+.table{width:100%;border-collapse:collapse;overflow:hidden;border-radius:16px}
+.table th,.table td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px;text-align:left}
+.table th{color:var(--muted);font-weight:950}
+
+/* Apple Watch ring border (optional) */
+.ringBorder{position:relative}
+.ringBorder::before{
+  content:"";
+  position:absolute; inset:-1px;
+  border-radius: var(--radius2);
+  padding: 1px;
+  background: conic-gradient(from 90deg, var(--pink), var(--teal), var(--green), var(--pink));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events:none;
+}
+
+/* Mobile bottom nav */
+.bottomNav{
+  display:none;
+  position:fixed;
+  left:12px; right:12px; bottom:12px;
+  padding:10px;
+  border-radius:18px;
+  border:1px solid var(--border);
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow);
+  z-index:10;
+  justify-content:space-around;
+}
+.bottomNav a{
+  text-decoration:none;
+  color:var(--muted);
+  font-weight:950;
+  font-size:12px;
+  padding:8px 10px;
+  border-radius:12px;
+}
+.bottomNav a.active{
+  color:var(--text);
+  background: rgba(10,132,255,.18);
+  border:1px solid rgba(10,132,255,.60);
+}
+
+/* Responsive */
+@media (max-width: 1060px){
+  .shell{grid-template-columns: 78px 1fr;}
+  .right{display:none;}
+}
+@media (max-width: 760px){
+  .shell{grid-template-columns: 1fr; padding:12px;}
+  .sidebar{display:none;}
+  .grid4{grid-template-columns: repeat(2, minmax(0,1fr));}
+  .twoCols{grid-template-columns: 1fr;}
+  .formGrid{grid-template-columns: 1fr;}
+  .bottomNav{display:flex;}
+}
+@media (max-width: 760px){
+  body{
+    padding-bottom: 1200px; /* space for bottom nav + iPhone bar */
+  }
+  .shell{
+    padding-bottom: 120px;
+  }
+}

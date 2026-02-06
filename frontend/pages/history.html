@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>AstraSync • History</title>
+  <link rel="manifest" href="../public/manifest.json">
+  <link rel="stylesheet" href="../css/style.css">
+<link rel="manifest" href="../public/manifest.json">
+<meta name="theme-color" content="#0A84FF">
+<link rel="apple-touch-icon" href="../public/assets/icon-192.png">
+
+</head>
+<body>
+  <div class="shell" style="grid-template-columns:78px 1fr;">
+    <aside class="sidebar">
+      <div class="brand">AS</div>
+      <a class="navIcon" href="index.html">🏠</a>
+      <a class="navIcon" href="add_data.html">➕</a>
+      <a class="navIcon" href="upload.html">📄</a>
+      <a class="navIcon active" href="history.html">📈</a>
+      <a class="navIcon" href="report.html">🧾</a>
+      <a class="navIcon" href="profile.html">👤</a>
+    </aside>
+
+    <main class="main">
+      <section class="header">
+        <div>
+          <h1 class="hTitle">History & Trends</h1>
+          <div class="hSub">Last 7 days logs (demo local storage)</div>
+        </div>
+        <div class="hActions">
+          <a class="btn" href="report.html" style="text-decoration:none;">Generate Report</a>
+        </div>
+      </section>
+
+      <div class="card">
+        <h3 class="cardTitle">Last entries</h3>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Date</th><th>BP</th><th>SpO₂</th><th>Sleep</th><th>Steps</th><th>Risk</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+
+      <nav class="bottomNav">
+        <a href="index.html">Dashboard</a>
+        <a href="add_data.html">Add</a>
+        <a href="upload.html">Upload</a>
+        <a class="active" href="history.html">History</a>
+        <a href="profile.html">Profile</a>
+      </nav>
+    </main>
+  </div>
+
+<script src="../js/app.js"></script>
+<script src="../js/api.js"></script>
+<script>
+  setActiveNav("history.html");
+  if (!localStorage.getItem("astrasync_authed")) window.location.href = "login.html";
+
+  const logs = getLogs().slice(0,7);
+  const tbody = document.getElementById("rows");
+  tbody.innerHTML = "";
+
+  if (!logs.length) {
+    tbody.innerHTML = `<tr><td colspan="6" class="muted">No logs yet. Add data first.</td></tr>`;
+  } else {
+    logs.forEach(l => {
+      const s = mockScore(l);
+      const pillClass = s.risk_color === "Green" ? "green" : s.risk_color === "Yellow" ? "yellow" : "red";
+      tbody.innerHTML += `
+        <tr>
+          <td>${l.date}</td>
+          <td>${l.bp_sys}/${l.bp_dia}</td>
+          <td>${l.spo2_avg}%</td>
+          <td>${l.sleep_hours}h</td>
+          <td>${l.steps}</td>
+          <td><span class="pill ${pillClass}">${s.risk_color}</span></td>
+        </tr>
+      `;
+    });
+  }
+</script>
+</body>
+</html>

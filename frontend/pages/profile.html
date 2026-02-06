@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>AstraSync • Profile</title>
+  <link rel="stylesheet" href="../css/style.css">
+<link rel="manifest" href="../public/manifest.json">
+<meta name="theme-color" content="#0A84FF">
+<link rel="apple-touch-icon" href="../public/assets/icon-192.png">
+
+</head>
+<body>
+  <div class="shell" style="grid-template-columns:1fr;max-width:980px;margin:0 auto;">
+    <div class="main">
+      <div class="header">
+        <div>
+          <h1 class="hTitle">Profile Setup</h1>
+          <div class="hSub">Basic info helps personalize your baseline and alerts.</div>
+        </div>
+        <div class="hActions">
+          <a class="btn secondary" href="index.html" style="text-decoration:none;">Go to Dashboard</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="cardTitle">User details</h3>
+        <div class="formGrid">
+          <div class="field"><label>Name</label><input id="name" placeholder="Your name"/></div>
+          <div class="field"><label>Age</label><input id="age" type="number" placeholder="21"/></div>
+          <div class="field"><label>Height (cm)</label><input id="height" type="number" placeholder="170"/></div>
+          <div class="field"><label>Weight (kg)</label><input id="weight" type="number" placeholder="65"/></div>
+        </div>
+
+        <div class="hr"></div>
+
+        <h3 class="cardTitle">Devices</h3>
+        <div class="toggleRow">
+          <label class="toggle"><input id="wearable" type="checkbox"/><span>Smartwatch / Band connected</span></label>
+          <label class="toggle"><input id="bp" type="checkbox"/><span>BP monitor available</span></label>
+          <label class="toggle"><input id="glucose" type="checkbox"/><span>Glucometer available</span></label>
+        </div>
+
+        <div class="hr"></div>
+
+        <label class="toggle">
+          <input id="consent" type="checkbox"/>
+          <span>I consent to store minimal health data securely.</span>
+        </label>
+
+        <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+          <button class="btn" id="saveBtn">Save Profile</button>
+          <button class="btn secondary" onclick="history.back()">Back</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottomNav">
+      <a href="index.html">Dashboard</a>
+      <a href="add_data.html">Add</a>
+      <a href="upload.html">Upload</a>
+      <a href="history.html">History</a>
+      <a class="active" href="profile.html">Profile</a>
+    </div>
+  </div>
+<script src="../js/app.js"></script>
+<script src="../js/api.js"></script>
+<script>
+  setActiveNav("profile.html");
+  const p = getProfile();
+  ["name","age","height","weight"].forEach(k => { if (p[k]) document.getElementById(k).value = p[k]; });
+  if (p.devices) {
+    document.getElementById("wearable").checked = !!p.devices.wearable;
+    document.getElementById("bp").checked = !!p.devices.bp;
+    document.getElementById("glucose").checked = !!p.devices.glucose;
+  }
+  document.getElementById("consent").checked = !!p.consent;
+
+  document.getElementById("saveBtn").addEventListener("click", () => {
+    const consent = document.getElementById("consent").checked;
+    if (!consent) { alert("Consent required to proceed."); return; }
+    const profile = {
+      name: document.getElementById("name").value || "User",
+      age: Number(document.getElementById("age").value || 0),
+      height: Number(document.getElementById("height").value || 0),
+      weight: Number(document.getElementById("weight").value || 0),
+      consent,
+      devices: {
+        wearable: document.getElementById("wearable").checked,
+        bp: document.getElementById("bp").checked,
+        glucose: document.getElementById("glucose").checked
+      }
+    };
+    setProfile(profile);
+
+// send to backend also
+apiPost("/profile", { user_id: "demo_user", ...profile })
+  .then((r) => {
+    if (r && r.ok === false) console.warn("Backend profile save failed:", r);
+  })
+  .catch((e) => console.warn("Backend not reachable:", e));
+
+alert("Profile saved.");
+window.location.href = "index.html";
+  });
+</script>
+</body>
+</html>

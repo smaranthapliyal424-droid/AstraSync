@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>AstraSync • Add Data</title>
+  <link rel="manifest" href="../public/manifest.json">
+  <link rel="stylesheet" href="../css/style.css">
+<meta name="theme-color" content="#0A84FF">
+<link rel="apple-touch-icon" href="../public/assets/icon-192.png">
+
+</head>
+<body>
+  <div class="shell" style="grid-template-columns:78px 1fr;">
+    <aside class="sidebar">
+      <div class="brand">AS</div>
+      <a class="navIcon" href="index.html">🏠</a>
+      <a class="navIcon active" href="add_data.html">➕</a>
+      <a class="navIcon" href="upload.html">📄</a>
+      <a class="navIcon" href="history.html">📈</a>
+      <a class="navIcon" href="report.html">🧾</a>
+      <a class="navIcon" href="profile.html">👤</a>
+    </aside>
+
+    <main class="main">
+      <section class="header">
+        <div>
+          <h1 class="hTitle">Add Health Data</h1>
+          <div class="hSub">Manual entry (works even without devices)</div>
+        </div>
+        <div class="hActions">
+          <button class="btn secondary" onclick="enableAlerts()">Enable Alerts</button>
+          <a class="btn" href="index.html" style="text-decoration:none;">Back</a>
+        </div>
+      </section>
+
+      <div class="card">
+        <h3 class="cardTitle">Today’s Entry</h3>
+
+        <div class="formGrid">
+          <div class="field"><label>Date</label><input id="date" type="date"/></div>
+          <div class="field"><label>Steps</label><input id="steps" type="number" placeholder="5000"/></div>
+
+          <div class="field"><label>Sleep Hours</label><input id="sleep_hours" type="number" step="0.1" placeholder="7.0"/></div>
+          <div class="field"><label>SpO₂ Avg (%)</label><input id="spo2_avg" type="number" placeholder="97"/></div>
+
+          <div class="field"><label>Resting HR (bpm)</label><input id="resting_hr" type="number" placeholder="72"/></div>
+          <div class="field"><label>Water Intake (ml)</label><input id="water_ml" type="number" placeholder="2000"/></div>
+
+          <div class="field"><label>BP Systolic</label><input id="bp_sys" type="number" placeholder="120"/></div>
+          <div class="field"><label>BP Diastolic</label><input id="bp_dia" type="number" placeholder="80"/></div>
+
+          <div class="field"><label>Screen Time (min)</label><input id="screen_time_min" type="number" placeholder="240"/></div>
+          <div class="field"><label>Toilet Frequency</label><input id="toilet_freq" type="number" placeholder="5"/></div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="toggleRow">
+          <label class="toggle"><input id="alcohol" type="checkbox"/><span>Alcohol</span></label>
+          <label class="toggle"><input id="smoking" type="checkbox"/><span>Smoking</span></label>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+          <button class="btn" id="saveBtn">Save & Analyze</button>
+          <a class="btn secondary" href="history.html" style="text-decoration:none;">View History</a>
+        </div>
+
+        <p class="muted" style="margin-top:10px">
+          Tip: For better accuracy, use BP cuff readings and consistent times.
+        </p>
+      </div>
+
+      <nav class="bottomNav">
+        <a href="index.html">Dashboard</a>
+        <a class="active" href="add_data.html">Add</a>
+        <a href="upload.html">Upload</a>
+        <a href="history.html">History</a>
+        <a href="profile.html">Profile</a>
+      </nav>
+    </main>
+  </div>
+
+<script src="../js/app.js"></script>
+<script src="../js/api.js"></script>
+<script>
+  setActiveNav("add_data.html");
+  if (!localStorage.getItem("astrasync_authed")) window.location.href = "login.html";
+
+  document.getElementById("date").value = todayISO();
+
+  document.getElementById("saveBtn").addEventListener("click", async () => {
+    try {
+      // Collect form values safely
+      const entry = {
+        user_id: "demo_user",
+        date: document.getElementById("date").value || todayISO(),
+
+        steps: Number(document.getElementById("steps").value || 0),
+        sleep_hours: Number(document.getElementById("sleep_hours").value || 0),
+        spo2_avg: Number(document.getElementById("spo2_avg").value || 0),
+        resting_hr: Number(document.getElementById("resting_hr").value || 0),
+
+        water_ml: Number(document.getElementById("water_ml").value || 0),
+
+        bp_sys: Number(document.getElementById("bp_sys").value || 0),
+        bp_dia: Number(document.getElementById("bp_dia").value || 0),
+
+        screen_time_min: Number(document.getElementById("screen_time_min").value || 0),
+        toilet_freq: Number(document.getElementById("toilet_freq").value || 0),
+
+        alcohol: document.getElementById("alcohol").checked ? 1 : 0,
+        smoking: document.getElementById("smoking").checked ? 1 : 0
+      };
+
+      // 1) Save to backend DB
+      await apiPost("/submit_data", entry);
+
+      // 2) Get score from backend model
+      const score = await apiPost("/score", entry);
+
+      // 3) Store locally so dashboard can display it
+      localStorage.setItem("astrasync_last_score", JSON.stringify(score));
+
+      alert(`Saved ✅ Risk: ${score.risk_color} (${score.confidence}%)`);
+      window.location.href = "index.html";
+    } catch (err) {
+      console.error(err);
+      alert("Save failed. Check backend connection and try again.");
+    }
+  });
+</script>
+</body>
+</html>

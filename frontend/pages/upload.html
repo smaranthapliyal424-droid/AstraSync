@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>AstraSync • Upload Reports</title>
+    <link rel="manifest" href="../public/manifest.json">
+  <link rel="stylesheet" href="../css/style.css">
+<link rel="manifest" href="../public/manifest.json">
+<meta name="theme-color" content="#0A84FF">
+<link rel="apple-touch-icon" href="../public/assets/icon-192.png">
+</head>
+<body>
+  <div class="shell" style="grid-template-columns:78px 1fr;">
+    <aside class="sidebar">
+      <div class="brand">AS</div>
+      <a class="navIcon" href="index.html">🏠</a>
+      <a class="navIcon" href="add_data.html">➕</a>
+      <a class="navIcon active" href="upload.html">📄</a>
+      <a class="navIcon" href="history.html">📈</a>
+      <a class="navIcon" href="report.html">🧾</a>
+      <a class="navIcon" href="profile.html">👤</a>
+    </aside>
+
+    <main class="main">
+      <section class="header">
+        <div>
+          <h1 class="hTitle">Upload Reports</h1>
+          <div class="hSub">Prescription/Lab OCR + optional Chest X-ray screening (demo)</div>
+        </div>
+        <div class="hActions">
+          <a class="btn secondary" href="index.html" style="text-decoration:none;">Back</a>
+        </div>
+      </section>
+
+      <div class="twoCols">
+        <div class="card">
+          <h3 class="cardTitle">Prescription / Lab Report</h3>
+          <div class="muted">Upload PDF/Image → Extract values</div>
+          <div class="hr"></div>
+
+          <input class="input" type="file" id="docFile" accept=".pdf,image/*"/>
+          <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+            <button class="btn" id="extractBtn">Extract Values (Demo)</button>
+            <button class="btn secondary" id="autofillBtn">Auto-fill Add Data (Demo)</button>
+          </div>
+
+          <div class="hr"></div>
+
+          <h3 class="cardTitle">Extracted Values Preview</h3>
+          <table class="table">
+            <thead><tr><th>Field</th><th>Value</th></tr></thead>
+            <tbody id="extractedTable">
+              <tr><td>BP</td><td>—</td></tr>
+              <tr><td>Glucose</td><td>—</td></tr>
+              <tr><td>Creatinine / eGFR</td><td>—</td></tr>
+            </tbody>
+          </table>
+
+          <p class="muted" style="margin-top:10px">
+            OCR extraction will be handled in backend using Tesseract later.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3 class="cardTitle">Chest X-ray (Optional)</h3>
+          <div class="muted">Upload X-ray → screening support (not diagnosis)</div>
+          <div class="hr"></div>
+
+          <input class="input" type="file" id="xrayFile" accept="image/*"/>
+          <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+            <button class="btn" id="xrayBtn">Run Screening (Demo)</button>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="card" style="padding:12px;margin:0">
+            <div class="muted">Screening Result</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+              <div style="font-weight:900;font-size:18px" id="xrayLabel">—</div>
+              <div class="pill" id="xrayPill">—</div>
+            </div>
+            <p class="muted" style="margin-top:10px">
+              Disclaimer: This is only a screening indicator. Consult a radiologist/doctor for confirmation.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <nav class="bottomNav">
+        <a href="index.html">Dashboard</a>
+        <a href="add_data.html">Add</a>
+        <a class="active" href="upload.html">Upload</a>
+        <a href="history.html">History</a>
+        <a href="profile.html">Profile</a>
+      </nav>
+    </main>
+  </div>
+
+<script src="../js/app.js"></script>
+<script src="../js/api.js"></script>
+<script>
+  setActiveNav("upload.html");
+  if (!localStorage.getItem("astrasync_authed")) window.location.href = "login.html";
+
+  let extracted = { bp_sys: 138, bp_dia: 90, spo2_avg: 96, resting_hr: 78 };
+
+  document.getElementById("extractBtn").addEventListener("click", () => {
+    // demo extraction
+    const tb = document.getElementById("extractedTable");
+    tb.innerHTML = `
+      <tr><td>BP</td><td>${extracted.bp_sys}/${extracted.bp_dia}</td></tr>
+      <tr><td>Glucose</td><td>105 mg/dL</td></tr>
+      <tr><td>Creatinine / eGFR</td><td>1.1 mg/dL / 78</td></tr>
+    `;
+    alert("Demo values extracted. Backend OCR will replace this.");
+  });
+
+  document.getElementById("autofillBtn").addEventListener("click", () => {
+    localStorage.setItem("astrasync_autofill", JSON.stringify(extracted));
+    alert("Saved extracted values. Go to Add Data to use them.");
+    window.location.href = "add_data.html";
+  });
+
+  document.getElementById("xrayBtn").addEventListener("click", () => {
+    const score = Math.random();
+    const label = score > 0.75 ? "Higher concern" : score > 0.45 ? "Moderate" : "Low concern";
+    const pill = document.getElementById("xrayPill");
+    pill.textContent = label.includes("Higher") ? "High" : label.includes("Moderate") ? "Medium" : "Low";
+    pill.className = "pill " + (pill.textContent==="High" ? "red" : pill.textContent==="Medium" ? "yellow" : "green");
+    document.getElementById("xrayLabel").textContent = `Screening: ${label}`;
+  });
+</script>
+</body>
+</html>

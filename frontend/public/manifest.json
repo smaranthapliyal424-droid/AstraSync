@@ -1,0 +1,13 @@
+{
+  "name": "AstraSync",
+  "short_name": "AstraSync",
+  "start_url": "/frontend/pages/index.html",
+  "scope": "/frontend/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#0A84FF",
+  "icons": [
+    { "src": "/frontend/public/assets/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/frontend/public/assets/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>AstraSync • Dashboard</title>
+  <link rel="stylesheet" href="../css/style.css">
+<link rel="manifest" href="../public/manifest.json">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="manifest" href="../public/manifest.json">
+<meta name="theme-color" content="#0A84FF">
+<link rel="apple-touch-icon" href="../public/assets/icon-192.png">
+
+</head>
+<body>
+  <div class="shell">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">AS</div>
+      <a class="navIcon active" href="index.html" title="Dashboard">🏠</a>
+      <a class="navIcon" href="add_data.html" title="Add Data">➕</a>
+      <a class="navIcon" href="upload.html" title="Upload">📄</a>
+      <a class="navIcon" href="history.html" title="History">📈</a>
+      <a class="navIcon" href="report.html" title="Report">🧾</a>
+      <a class="navIcon" href="profile.html" title="Profile">👤</a>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <section class="header">
+        <div>
+          <h1 class="hTitle">Stress & Risk Overview</h1>
+          <div class="hSub">AstraSync screening dashboard • trends, triggers, next steps</div>
+        </div>
+        <div class="hActions">
+          <select class="select" id="range">
+            <option value="today">Today</option>
+            <option value="week" selected>Week</option>
+            <option value="month">Month</option>
+          </select>
+          <button class="btn secondary" onclick="enableAlerts()">Enable Alerts</button>
+          <a class="btn" href="add_data.html" style="text-decoration:none;">Add Data</a>
+        </div>
+      </section>
+
+      <!-- Metric Cards -->
+      <section class="grid4">
+        <div class="card">
+          <div class="muted">Steps</div>
+          <div class="metric">
+            <div class="value" id="mSteps">—</div>
+            <span class="pill" id="pSteps">Goal</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="muted">Water Intake</div>
+          <div class="metric">
+            <div class="value" id="mWater">—</div>
+            <span class="pill">ml</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="muted">Sleep Hours</div>
+          <div class="metric">
+            <div class="value" id="mSleep">—</div>
+            <span class="pill" id="pSleep">Target</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="muted">SpO₂ / Resting HR</div>
+          <div class="metric">
+            <div class="value" id="mSpo2">—</div>
+            <span class="pill" id="mRHR">—</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Main charts + risk -->
+      <section class="twoCols">
+        <div class="card ringBorder">
+          <div class="riskTop">
+            <div>
+              <h3 class="cardTitle">AstraSync Risk Status</h3>
+              <div class="muted">Screening result based on trends & logs</div>
+            </div>
+            <div style="text-align:right">
+              <div class="pill" id="riskPill">Green</div>
+              <div class="conf" id="confTxt">Confidence —%</div>
+            </div>
+          </div>
+
+          <div class="chips" id="reasonChips"></div>
+
+          <ul class="checklist" id="nextSteps"></ul>
+
+          <div class="hr"></div>
+          <div class="muted">
+            Not a diagnosis. If symptoms occur, consult a doctor.
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="cardTitle">Stress Timeline</h3>
+          <div class="muted">Hourly pattern (demo)</div>
+          <canvas id="stressChart" height="120"></canvas>
+        </div>
+      </section>
+
+      <section class="twoCols">
+        <div class="card">
+          <h3 class="cardTitle">7-day Vitals Trend</h3>
+          <div class="muted">BP / SpO₂ / Sleep / HR (demo)</div>
+          <canvas id="trendChart" height="120"></canvas>
+        </div>
+
+        <div class="card">
+          <h3 class="cardTitle">Recovery / Readiness</h3>
+          <div class="muted">Simple gauge (demo)</div>
+          <canvas id="donutChart" height="120"></canvas>
+        </div>
+      </section>
+    </main>
+
+    <!-- Right panel -->
+    <aside class="right">
+      <div class="profileCard">
+        <div class="avatar"></div>
+        <div>
+          <div class="profileName" id="pName">User</div>
+          <div class="muted" id="pTag">AstraSync Profile</div>
+        </div>
+      </div>
+
+      <div class="kvGrid">
+        <div class="kv"><div class="k">Age</div><div class="v" id="pAge">—</div></div>
+        <div class="kv"><div class="k">Height</div><div class="v" id="pH">—</div></div>
+        <div class="kv"><div class="k">Weight</div><div class="v" id="pW">—</div></div>
+      </div>
+
+      <div class="card" style="padding:12px;margin:0">
+        <div class="muted">Organ Status</div>
+        <div class="list" style="margin-top:10px">
+          <div class="listItem"><span>Heart</span><span class="pill" id="sHeart">—</span></div>
+          <div class="listItem"><span>Kidney</span><span class="pill" id="sKidney">—</span></div>
+          <div class="listItem"><span>Sleep</span><span class="pill" id="sSleep">—</span></div>
+        </div>
+      </div>
+
+      <div class="card" style="padding:12px;margin:0">
+        <div class="muted">Reminders</div>
+        <div class="list" style="margin-top:10px">
+          <div class="listItem"><span>Add evening BP reading</span><span>⏱</span></div>
+          <div class="listItem"><span>Upload lab report</span><span>📄</span></div>
+          <div class="listItem"><span>Track sleep tonight</span><span>🌙</span></div>
+        </div>
+      </div>
+
+      <a class="btn" href="report.html" style="text-decoration:none;text-align:center;">Download Summary PDF</a>
+    </aside>
+
+    <nav class="bottomNav">
+      <a class="active" href="index.html">Dashboard</a>
+      <a href="add_data.html">Add</a>
+      <a href="upload.html">Upload</a>
+      <a href="history.html">History</a>
+      <a href="profile.html">Profile</a>
+    </nav>
+  </div>
+
+<script src="../js/app.js"></script>
+<script src="../js/api.js"></script>
+<script>
+  setActiveNav("index.html");
+
+  // simple auth gate
+  if (!localStorage.getItem("astrasync_authed")) {
+    window.location.href = "login.html";
+  }
+  const last = JSON.parse(localStorage.getItem("astrasync_last_score") || "null");
+if(last){
+  // use last.risk_color, last.confidence, last.reasons, last.next_steps
+}
+
+  const profile = getProfile();
+  document.getElementById("pName").textContent = profile.name || "User";
+  document.getElementById("pAge").textContent = profile.age ? profile.age : "—";
+  document.getElementById("pH").textContent = profile.height ? profile.height + "cm" : "—";
+  document.getElementById("pW").textContent = profile.weight ? profile.weight + "kg" : "—";
+
+  // Get latest log or create demo default
+  const logs = getLogs();
+  const latest = logs[0] || {
+    date: todayISO(),
+    steps: 3200,
+    sleep_hours: 5.2,
+    spo2_avg: 93,
+    resting_hr: 86,
+    bp_sys: 142,
+    bp_dia: 92,
+    water_ml: 1200,
+    screen_time_min: 410,
+    toilet_freq: 5,
+    alcohol: 0,
+    smoking: 0
+  };
+
+  // Score (mock for now)
+  const score = mockScore(latest);
+
+  // Fill metrics
+  document.getElementById("mSteps").textContent = latest.steps.toLocaleString();
+  document.getElementById("mWater").textContent = `${latest.water_ml}`;
+  document.getElementById("mSleep").textContent = `${latest.sleep_hours}`;
+  document.getElementById("mSpo2").textContent = `${latest.spo2_avg}%`;
+  document.getElementById("mRHR").textContent = `${latest.resting_hr} bpm`;
+
+  // Risk pill
+  const pill = document.getElementById("riskPill");
+  pill.textContent = score.risk_color;
+  pill.className = "pill " + (score.risk_color === "Green" ? "green" : score.risk_color === "Yellow" ? "yellow" : "red");
+  document.getElementById("confTxt").textContent = `Confidence ${score.confidence}%`;
+
+  // Reasons
+  const reasonsEl = document.getElementById("reasonChips");
+  reasonsEl.innerHTML = "";
+  score.reasons.forEach(r => {
+    const d = document.createElement("div");
+    d.className = "chip";
+    d.textContent = r;
+    reasonsEl.appendChild(d);
+  });
+
+  // Next steps
+  const ns = document.getElementById("nextSteps");
+  ns.innerHTML = "";
+  score.next_steps.forEach(t => {
+    const li = document.createElement("li");
+    li.innerHTML = `<span>✓</span><div>${t}</div>`;
+    ns.appendChild(li);
+  });
+
+  // Organ status
+  const setPill = (id, val) => {
+    const el = document.getElementById(id);
+    el.textContent = val;
+    el.className = "pill " + (val === "Normal" ? "green" : val === "At risk" ? "yellow" : (val === "Elevated" ? "yellow" : ""));
+  };
+  setPill("sHeart", score.organ.heart);
+  document.getElementById("sKidney").textContent = score.organ.kidney;
+  setPill("sSleep", score.organ.sleep);
+
+  // Charts
+  const stressCtx = document.getElementById("stressChart");
+  const hours = [...Array(12)].map((_,i)=>`${i+8}:00`);
+  const stressData = hours.map(()=> Math.floor(20 + Math.random()*70));
+
+  new Chart(stressCtx, {
+    type: "line",
+    data: {
+      labels: hours,
+      datasets: [{ label: "Stress", data: stressData, tension: .35, fill: true }]
+    },
+    options: { responsive:true, plugins:{legend:{display:false}} }
+  });
+
+  const trendCtx = document.getElementById("trendChart");
+  const days = logs.slice(0,7).reverse().map(x=>x.date).filter(Boolean);
+  const dLabels = days.length ? days : ["D-6","D-5","D-4","D-3","D-2","D-1","Today"];
+  const bpSeries = logs.slice(0,7).reverse().map(x=>x.bp_sys || 120);
+  const sleepSeries = logs.slice(0,7).reverse().map(x=>x.sleep_hours || 6);
+
+  new Chart(trendCtx, {
+    type:"line",
+    data:{
+      labels:dLabels,
+      datasets:[
+        {label:"BP Sys", data: bpSeries.length ? bpSeries : [120,122,125,130,138,140,latest.bp_sys], tension:.35},
+        {label:"Sleep", data: sleepSeries.length ? sleepSeries : [7,6.5,6,5.5,5.2,5.1,latest.sleep_hours], tension:.35}
+      ]
+    },
+    options:{responsive:true}
+  });
+
+  const donutCtx = document.getElementById("donutChart");
+  const readiness = Math.min(95, Math.max(10, 80 - (latest.screen_time_min/10) + (latest.sleep_hours*6)));
+  new Chart(donutCtx, {
+    type:"doughnut",
+    data:{
+      labels:["Readiness","Remaining"],
+      datasets:[{data:[readiness, 100-readiness]}]
+    },
+    options:{plugins:{legend:{position:"bottom"}}}
+  });
+
+  // Optional: local notification on Red
+  if (score.risk_color === "Red" && Notification.permission === "granted") {
+    new Notification("AstraSync: High Risk Alert", { body: "Please review next steps and consider consulting a doctor." });
+  }
+</script>
+</body>
+</html>

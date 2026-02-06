@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AstraSync • Login</title>
+  <link rel="manifest" href="../public/manifest.json">
+  <link rel="stylesheet" href="../css/style.css">
+<link rel="manifest" href="../public/manifest.json">
+<meta name="theme-color" content="#0A84FF">
+<link rel="apple-touch-icon" href="../public/assets/icon-192.png">
+
+</head>
+<body>
+  <div class="shell" style="grid-template-columns:1fr;max-width:980px;margin:0 auto;">
+    <div class="main">
+      <div class="header">
+        <div>
+          <h1 class="hTitle">AstraSync</h1>
+          <div class="hSub">Login to your health risk dashboard (PWA + Web)</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="cardTitle">Sign in</h3>
+        <div class="formGrid">
+          <div class="field">
+            <label>Email / Phone</label>
+            <input id="email" placeholder="you@example.com" />
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <input id="pass" type="password" placeholder="••••••••" />
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <label class="toggle" style="width:fit-content">
+          <input id="consent" type="checkbox" />
+          <span>I consent to use my health data for analysis.</span>
+        </label>
+
+        <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+          <button class="btn" id="loginBtn">Continue</button>
+          <a class="btn secondary" href="profile.html" style="text-decoration:none;">Setup Profile</a>
+        </div>
+
+        <p class="muted" style="margin-top:10px">
+          Note: This is a hackathon demo. Screening support only — not a diagnosis.
+        </p>
+      </div>
+    </div>
+
+    <div class="bottomNav">
+      <a class="active" href="login.html">Login</a>
+      <a href="index.html">Dashboard</a>
+      <a href="add_data.html">Add</a>
+      <a href="upload.html">Upload</a>
+      <a href="history.html">History</a>
+    </div>
+  </div>
+
+<script src="../js/app.js"></script>
+<script src="../js/api.js"></script>
+<script>
+  setActiveNav("login.html");
+  document.getElementById("loginBtn").addEventListener("click", () => {
+    if (!document.getElementById("consent").checked) {
+      alert("Please provide consent to proceed.");
+      return;
+    }
+    // Demo login success
+    localStorage.setItem("astrasync_authed", "1");
+    window.location.href = "index.html";
+  });
+</script>
+</body>
+</html>

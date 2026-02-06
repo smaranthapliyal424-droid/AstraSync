@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>AstraSync • Report</title>
+  <link rel="stylesheet" href="../css/style.css">
+<link rel="manifest" href="../public/manifest.json">
+  <style>
+    @media print{
+      body{background:#fff;color:#000}
+      .sidebar,.bottomNav,.header .hActions{display:none !important}
+      .card{box-shadow:none;border:1px solid #ddd}
+      .shell{grid-template-columns:1fr !important}
+    }
+  </style>
+  <link rel="manifest" href="../public/manifest.json">
+<meta name="theme-color" content="#0A84FF">
+<link rel="apple-touch-icon" href="../public/assets/icon-192.png">
+
+</head>
+<body>
+  <div class="shell" style="grid-template-columns:78px 1fr;">
+    <aside class="sidebar">
+      <div class="brand">AS</div>
+      <a class="navIcon" href="index.html">🏠</a>
+      <a class="navIcon" href="add_data.html">➕</a>
+      <a class="navIcon" href="upload.html">📄</a>
+      <a class="navIcon" href="history.html">📈</a>
+      <a class="navIcon active" href="report.html">🧾</a>
+      <a class="navIcon" href="profile.html">👤</a>
+    </aside>
+
+    <main class="main">
+      <section class="header">
+        <div>
+          <h1 class="hTitle">Self + Doctor Summary</h1>
+          <div class="hSub">Generated from last 7 days inputs (demo)</div>
+        </div>
+        <div class="hActions">
+          <button class="btn" onclick="window.print()">Download PDF (Print)</button>
+          <a class="btn secondary" href="index.html" style="text-decoration:none;">Back</a>
+        </div>
+      </section>
+
+      <div class="card" id="reportCard">
+        <h3 class="cardTitle">AstraSync Screening Summary</h3>
+        <div class="muted" id="meta"></div>
+        <div class="hr"></div>
+
+        <div id="riskBlock"></div>
+
+        <div class="hr"></div>
+        <h3 class="cardTitle">Top triggers (explainability)</h3>
+        <ul id="triggers"></ul>
+
+        <div class="hr"></div>
+        <h3 class="cardTitle">Suggested next steps</h3>
+        <ul id="steps"></ul>
+
+        <div class="hr"></div>
+        <h3 class="cardTitle">Doctor notes (for consultation)</h3>
+        <p class="muted">
+          Please review trends, confirm readings with clinical measurements, and advise next tests if needed.
+          This report is not a diagnosis; it is a screening support summary.
+        </p>
+      </div>
+
+      <nav class="bottomNav">
+        <a href="index.html">Dashboard</a>
+        <a href="add_data.html">Add</a>
+        <a href="upload.html">Upload</a>
+        <a href="history.html">History</a>
+        <a class="active" href="report.html">Report</a>
+      </nav>
+    </main>
+  </div>
+
+<script src="../js/app.js"></script>
+<script src="../js/api.js"></script>
+<script>
+  setActiveNav("report.html");
+  if (!localStorage.getItem("astrasync_authed")) window.location.href = "login.html";
+
+  const profile = getProfile();
+  const logs = getLogs().slice(0,7);
+  const latest = logs[0] || { date: todayISO(), steps:0, sleep_hours:0, spo2_avg:0, resting_hr:0, bp_sys:0, bp_dia:0, water_ml:0, screen_time_min:0, toilet_freq:0, alcohol:0, smoking:0 };
+  const score = mockScore(latest);
+
+  document.getElementById("meta").textContent =
+    `Name: ${profile.name || "User"} • Date: ${todayISO()} • Based on last ${Math.min(7, logs.length)} day(s)`;
+
+  const pillClass = score.risk_color==="Green"?"green":score.risk_color==="Yellow"?"yellow":"red";
+  document.getElementById("riskBlock").innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+      <div style="font-weight:900;font-size:18px">Overall Risk: <span class="pill ${pillClass}">${score.risk_color}</span></div>
+      <div class="muted" style="font-weight:900">Confidence: ${score.confidence}%</div>
+    </div>
+    <div class="muted" style="margin-top:10px">Latest values: BP ${latest.bp_sys}/${latest.bp_dia}, SpO₂ ${latest.spo2_avg}%, Sleep ${latest.sleep_hours}h, Steps ${latest.steps}</div>
+  `;
+
+  const trig = document.getElementById("triggers");
+  trig.innerHTML = score.reasons.map(r => `<li>${r}</li>`).join("");
+
+  const steps = document.getElementById("steps");
+  steps.innerHTML = score.next_steps.map(s => `<li>${s}</li>`).join("");
+</script>
+</body>
+</html>
