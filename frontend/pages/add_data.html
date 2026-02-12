@@ -1,11 +1,11 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>AstraSync • Add Data</title>
+  <title>AstraSync â€¢ Add Data</title>
   <link rel="manifest" href="../public/manifest.json">
-  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="css/style.css">
 <meta name="theme-color" content="#0A84FF">
 <link rel="apple-touch-icon" href="../public/assets/icon-192.png">
 
@@ -14,12 +14,12 @@
   <div class="shell" style="grid-template-columns:78px 1fr;">
     <aside class="sidebar">
       <div class="brand">AS</div>
-      <a class="navIcon" href="index.html">🏠</a>
-      <a class="navIcon active" href="add_data.html">➕</a>
-      <a class="navIcon" href="upload.html">📄</a>
-      <a class="navIcon" href="history.html">📈</a>
-      <a class="navIcon" href="report.html">🧾</a>
-      <a class="navIcon" href="profile.html">👤</a>
+      <a class="navIcon" href="index.html">ðŸ </a>
+      <a class="navIcon active" href="add_data.html">âž•</a>
+      <a class="navIcon" href="upload.html">ðŸ“„</a>
+      <a class="navIcon" href="history.html">ðŸ“ˆ</a>
+      <a class="navIcon" href="report.html">ðŸ§¾</a>
+      <a class="navIcon" href="profile.html"><i class='fas fa-user-alt' style='font-size:36px'></i></a>
     </aside>
 
     <main class="main">
@@ -35,14 +35,14 @@
       </section>
 
       <div class="card">
-        <h3 class="cardTitle">Today’s Entry</h3>
+        <h3 class="cardTitle">Todayâ€™s Entry</h3>
 
         <div class="formGrid">
           <div class="field"><label>Date</label><input id="date" type="date"/></div>
           <div class="field"><label>Steps</label><input id="steps" type="number" placeholder="5000"/></div>
 
           <div class="field"><label>Sleep Hours</label><input id="sleep_hours" type="number" step="0.1" placeholder="7.0"/></div>
-          <div class="field"><label>SpO₂ Avg (%)</label><input id="spo2_avg" type="number" placeholder="97"/></div>
+          <div class="field"><label>SpOâ‚‚ Avg (%)</label><input id="spo2_avg" type="number" placeholder="97"/></div>
 
           <div class="field"><label>Resting HR (bpm)</label><input id="resting_hr" type="number" placeholder="72"/></div>
           <div class="field"><label>Water Intake (ml)</label><input id="water_ml" type="number" placeholder="2000"/></div>
@@ -64,6 +64,9 @@
         <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
           <button class="btn" id="saveBtn">Save & Analyze</button>
           <a class="btn secondary" href="history.html" style="text-decoration:none;">View History</a>
+          <button type="button" id="syncBtn">Sync from Google Fit</button>
+
+
         </div>
 
         <p class="muted" style="margin-top:10px">
@@ -81,49 +84,106 @@
     </main>
   </div>
 
-<script src="../js/app.js"></script>
-<script src="../js/api.js"></script>
+<script src="js/app.js"></script>
+<script src="js/api.js"></script>
+
+  <script>
+document.getElementById("syncBtn").addEventListener("click", async () => {
+  try {
+    const data = await apiGet("/sync/google-fit");
+
+
+    // Auto-fill date
+    if (document.getElementById("date")) {
+      document.getElementById("date").value = data.date;
+    }
+
+    // Auto-fill steps
+    if (document.getElementById("steps")) {
+      document.getElementById("steps").value = data.steps ?? 0;
+    }
+
+    // Map heart_rate_avg → resting_hr
+    if (document.getElementById("resting_hr")) {
+      document.getElementById("resting_hr").value = data.heart_rate_avg ?? 0;
+    }
+
+    // Optional fields (if backend later provides them)
+    if (document.getElementById("sleep_hours") && data.sleep_hours) {
+      document.getElementById("sleep_hours").value = data.sleep_hours;
+    }
+
+    if (document.getElementById("spo2_avg") && data.spo2_avg) {
+      document.getElementById("spo2_avg").value = data.spo2_avg;
+    }
+
+    // Toilet frequency
+    if (document.getElementById("toilet_freq")) {
+      document.getElementById("toilet_freq").value = data.toilet_freq ?? 0;
+    }
+
+    // Toggle switches
+    if (document.getElementById("alcohol")) {
+      document.getElementById("alcohol").checked = data.alcohol === 1;
+    }
+
+    if (document.getElementById("smoking")) {
+      document.getElementById("smoking").checked = data.smoking === 1;
+    }
+
+    alert("Google Fit data synced successfully.");
+
+  } catch (err) {
+    console.error(err);
+    alert("Sync failed. Check backend.");
+  }
+});
+</script>
 <script>
+
+
   setActiveNav("add_data.html");
   if (!localStorage.getItem("astrasync_authed")) window.location.href = "login.html";
 
-  document.getElementById("date").value = todayISO();
+  const dateEl = document.getElementById("date");
+  const saveBtn = document.getElementById("saveBtn");
+  const num = (id) => Number(document.getElementById(id).value || 0);
+  dateEl.value = todayISO();
+  
+  
 
-  document.getElementById("saveBtn").addEventListener("click", async () => {
+  saveBtn.addEventListener("click", async () => {
     try {
-      // Collect form values safely
       const entry = {
         user_id: "demo_user",
-        date: document.getElementById("date").value || todayISO(),
-
-        steps: Number(document.getElementById("steps").value || 0),
-        sleep_hours: Number(document.getElementById("sleep_hours").value || 0),
-        spo2_avg: Number(document.getElementById("spo2_avg").value || 0),
-        resting_hr: Number(document.getElementById("resting_hr").value || 0),
-
-        water_ml: Number(document.getElementById("water_ml").value || 0),
-
-        bp_sys: Number(document.getElementById("bp_sys").value || 0),
-        bp_dia: Number(document.getElementById("bp_dia").value || 0),
-
-        screen_time_min: Number(document.getElementById("screen_time_min").value || 0),
-        toilet_freq: Number(document.getElementById("toilet_freq").value || 0),
-
+        date: dateEl.value || todayISO(),
+        steps: num("steps"),
+        sleep_hours: num("sleep_hours"),
+        spo2_avg: num("spo2_avg"),
+        resting_hr: num("resting_hr"),
+        water_ml: num("water_ml"),
+        bp_sys: num("bp_sys"),
+        bp_dia: num("bp_dia"),
+        screen_time_min: num("screen_time_min"),
+        toilet_freq: num("toilet_freq"),
         alcohol: document.getElementById("alcohol").checked ? 1 : 0,
         smoking: document.getElementById("smoking").checked ? 1 : 0
       };
 
-      // 1) Save to backend DB
-      await apiPost("/submit_data", entry);
-
-      // 2) Get score from backend model
-      const score = await apiPost("/score", entry);
-
-      // 3) Store locally so dashboard can display it
+      const [, score] = await Promise.all([
+        apiPost("/submit_data", entry),
+        apiPost("/score", entry)
+      ]);
+      
+      addLog(entry);
       localStorage.setItem("astrasync_last_score", JSON.stringify(score));
 
-      alert(`Saved ✅ Risk: ${score.risk_color} (${score.confidence}%)`);
-      window.location.href = "index.html";
+      const risk = score?.risk_color ?? score?.risk ?? "Unknown";
+      const confidence = score?.confidence ?? score?.confidence_pct ?? "N/A";
+      alert(`Saved Risk: ${risk} (${confidence}%)`);
+      // window.location.href ="index.html";
+      window.location.href = "history.html";
+      
     } catch (err) {
       console.error(err);
       alert("Save failed. Check backend connection and try again.");
@@ -132,3 +192,4 @@
 </script>
 </body>
 </html>
+

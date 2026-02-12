@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>AstraSync • Dashboard</title>
-  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="css/style.css">
 <link rel="manifest" href="../public/manifest.json">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <link rel="manifest" href="../public/manifest.json">
@@ -17,7 +17,7 @@
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="brand">AS</div>
-      <a class="navIcon active" href="index.html" title="Dashboard">🏠</a>
+      <a class="navIcon active" href="index.html" title="Dashboard"><i class='fas fa-user-tie' style='font-size:36px'></i></a>
       <a class="navIcon" href="add_data.html" title="Add Data">➕</a>
       <a class="navIcon" href="upload.html" title="Upload">📄</a>
       <a class="navIcon" href="history.html" title="History">📈</a>
@@ -124,7 +124,7 @@
     <!-- Right panel -->
     <aside class="right">
       <div class="profileCard">
-        <div class="avatar"></div>
+        <div class="avatar"><i class='fas fa-user-tie' style='font-size:36px'></i></div>
         <div>
           <div class="profileName" id="pName">User</div>
           <div class="muted" id="pTag">AstraSync Profile</div>
@@ -167,8 +167,10 @@
     </nav>
   </div>
 
-<script src="../js/app.js"></script>
-<script src="../js/api.js"></script>
+<script src="js/app.js"></script>
+<script src="js/api.js"></script>
+
+<script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
 <script>
   setActiveNav("index.html");
 
@@ -205,7 +207,7 @@ if(last){
   };
 
   // Score (mock for now)
-  const score = mockScore(latest);
+const score = await scoreEntry(latest);
 
   // Fill metrics
   document.getElementById("mSteps").textContent = latest.steps.toLocaleString();
@@ -296,6 +298,60 @@ if(last){
   if (score.risk_color === "Red" && Notification.permission === "granted") {
     new Notification("AstraSync: High Risk Alert", { body: "Please review next steps and consider consulting a doctor." });
   }
+
+(async function(){
+
+  setActiveNav("index.html");
+
+  if (!localStorage.getItem("astrasync_authed")) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  const profile = getProfile();
+  document.getElementById("pName").textContent = profile.name || "User";
+  document.getElementById("pAge").textContent = profile.age || "—";
+  document.getElementById("pH").textContent = profile.height ? profile.height + "cm" : "—";
+  document.getElementById("pW").textContent = profile.weight ? profile.weight + "kg" : "—";
+
+  const logs = getLogs();
+  const latest = logs[0] || {
+    date: todayISO(),
+    steps: 3200,
+    sleep_hours: 5.2,
+    spo2_avg: 93,
+    resting_hr: 86,
+    bp_sys: 142,
+    bp_dia: 92,
+    water_ml: 1200,
+    screen_time_min: 410,
+    toilet_freq: 5,
+    alcohol: 0,
+    smoking: 0
+  };
+
+  // 🔥 REAL BACKEND SCORING
+  const score = await scoreEntry(latest);
+
+  // --- everything below stays SAME ---
+  document.getElementById("mSteps").textContent = latest.steps.toLocaleString();
+  document.getElementById("mWater").textContent = `${latest.water_ml}`;
+  document.getElementById("mSleep").textContent = `${latest.sleep_hours}`;
+  document.getElementById("mSpo2").textContent = `${latest.spo2_avg}%`;
+  document.getElementById("mRHR").textContent = `${latest.resting_hr} bpm`;
+
+  const pill = document.getElementById("riskPill");
+  pill.textContent = score.risk_color;
+  pill.className = "pill " + (
+    score.risk_color === "Green" ? "green" :
+    score.risk_color === "Yellow" ? "yellow" : "red"
+  );
+
+  document.getElementById("confTxt").textContent =
+    `Confidence ${score.confidence}%`;
+
+})();
 </script>
+
 </body>
 </html>

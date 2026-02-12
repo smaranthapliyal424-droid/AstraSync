@@ -1,25 +1,21 @@
 import sqlite3, json, os
 from pathlib import Path
 
-DB_PATH = os.getenv("DB_PATH", "./data/astrasync.db")
+BASE_DIR = Path(__file__).resolve().parent
+DB_PATH = os.getenv("DB_PATH", str(BASE_DIR / "../data/astrasync.db"))
+
 
 def get_conn():
     Path(DB_PATH).parent.mkdir(parents=True, exist_ok=True)
     return sqlite3.connect(DB_PATH, check_same_thread=False)
 
 def init_db(conn):
-    cur = conn.cursor()
-    cur.execute("""
+    from backend.services.db_service import init_tokens_table
+    init_tokens_table(conn)
+    with conn:
+    conn.execute("""
     CREATE TABLE IF NOT EXISTS profiles(
       user_id TEXT PRIMARY KEY,
-      payload TEXT NOT NULL
-    )
-    """)
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS logs(
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id TEXT NOT NULL,
-      date TEXT NOT NULL,
       payload TEXT NOT NULL
     )
     """)
@@ -47,3 +43,15 @@ def get_logs(conn, user_id: str, limit: int = 14) -> list[dict]:
                 (user_id, limit))
     rows = cur.fetchall()
     return [json.loads(r[0]) for r in rows]
+def init_tokens_table(conn):
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS user_tokens (
+            user_id TEXT,
+            provider TEXT,
+            access_token TEXT,
+            refresh_token TEXT,
+            expires_at INTEGER,
+            PRIMARY KEY (user_id, provider)
+        )
+    """)
+    conn.commit()

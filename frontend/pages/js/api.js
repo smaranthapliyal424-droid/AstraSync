@@ -1,5 +1,7 @@
-// Change this later when your Flask backend is live:
-const API_BASE = "http://192.168.19.12:5001"; // e.g. "https://your-backend.onrender.com"
+const API_BASE = window.location.hostname === "localhost"
+  ? "http://127.0.0.1:5001"
+  : "https://your-production-backend.com";
+
 
 async function apiPost(path, payload) {
   if (!API_BASE) return null;
@@ -8,7 +10,11 @@ async function apiPost(path, payload) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
-  if (!res.ok) throw new Error(await res.text());
+if (!res.ok) {
+  const text = await res.text();
+  console.error("API Error:", text);
+  return { error: text };
+}
   return res.json();
 }
 
@@ -74,4 +80,7 @@ function mockScore(entry) {
 async function scoreEntry(entry){
   // Backend scoring (your real model)
   return await apiPost("/score", entry);
+}
+async function syncGoogleFit() {
+  return await apiGet("/sync/google-fit");
 }
